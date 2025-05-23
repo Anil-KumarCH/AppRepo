@@ -123,7 +123,7 @@ const PostCard = ({ post }: { post: LinkedInPost }) => {
 
 
 // --- Main LinkedIn Insights Section Component ---
-const LinkedInInsights = () => {
+const LinkedInIn = () => {
     const sectionVariants = {
         hidden: { opacity: 0 },
         visible: {
@@ -182,4 +182,4 @@ const LinkedInInsights = () => {
     );
 };
 
-export default LinkedInInsights;
+export default LinkedInIn;

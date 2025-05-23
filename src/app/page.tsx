@@ -3,13 +3,13 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import Hero from "../components/hero";
 import AboutMe from "../components/aboutme"; // Corrected: Assuming default export based on previous context
-import ProjectsSection from "../components/projects";
-import EducationSection from "../components/education";
-import SkillsSection from "@/components/skills"; // Assuming this is the correct export name for your skills component (e.g., SkillNebulaV3)
-import LinkedInInsights from "@/components/LinkedIn";
-import DevToSection from "@/components/devTo"; // Corrected: Assuming default export
-import ContactForm from "@/components/contact"; // Corrected: Assuming default export
-import FeedbackModal from "../components/feedback"; // Corrected the import path
+import Projects from "../components/projects";
+import Education from "../components/education";
+import Skills from "@/components/skills"; // Assuming this is the correct export name for your skills component (e.g., SkillNebulaV3)
+import LinkedIn from "@/components/LinkedIn";
+import DevTo from "@/components/devTo"; // Corrected: Assuming default export
+import Contact from "@/components/contact"; // Corrected: Assuming default export
+import Feedback from "../components/feedback"; // Corrected the import path
 
 import "../../styles/globals.css";
 import "slick-carousel/slick/slick.css";
@@ -91,33 +91,33 @@ export default function Home() {
         {/* Education Section */}
         <section
           className="min-h-screen w-full flex items-center justify-center bg-gradient-to-b from-black to-gray-900 p-6"
-          id="EducationSection"
+          id="Education"
         >
-          <EducationSection />
+          <Education />
         </section>
 
         {/* Projects Section */}
         <section
           className="min-h-screen w-full flex items-center justify-center bg-black p-6"
-          id="ProjectsSection"
+          id="Projects"
         >
-          <ProjectsSection />
+          <Projects />
         </section>
 
         {/* Skills Section */}
         <section
           className="min-h-screen w-full flex items-center justify-center bg-black p-6"
-          id="SkillNebulaV3" // Ensure this ID matches the one in your Navbar
+          id="Skills" // Ensure this ID matches the one in your Navbar
         >
-          <SkillsSection /> {/* Ensure this is the correct component name */}
+          <Skills /> {/* Ensure this is the correct component name */}
         </section>
 
         {/* LinkedIn Section */}
         <section
           className="min-h-screen w-full flex items-center justify-center bg-black p-6"
-          id="LinkedInInsights"
+          id="LinkedIn"
         >
-          <LinkedInInsights />
+          <LinkedIn />
         </section>
 
         {/* Dev.to Section */}
@@ -125,22 +125,22 @@ export default function Home() {
         <div> 
           <section
             className="min-h-screen w-full flex items-center justify-center bg-black p-6"
-            id="DevToMasonryShowcase" // Corrected ID based on previous Navbar context
+            id="DevTo" // Corrected ID based on previous Navbar context
           >
-            <DevToSection username={devToUsername} />
+            <DevTo username={devToUsername} />
           </section>
         </div>
 
         {/* Contact Section */}
         <section
           className="min-h-screen w-full flex items-center justify-center bg-gradient-to-b from-black to-gray-900 p-6"
-          id="ContactForm" // Corrected ID based on previous Navbar context
+          id="Contact" // Corrected ID based on previous Navbar context
         >
-          <ContactForm />
+          <Contact />
         </section>
       </main>
 
-      <FeedbackModal
+      <Feedback
         isOpen={showFeedbackModal}
         onClose={() => setShowFeedbackModal(false)}
         googleFormUrl={googleFormUrl}

@@ -153,7 +153,7 @@ const EducationCard = ({
     );
 };
 
-const EducationSection = () => {
+const Education = () => {
     const sectionRef = useRef<HTMLElement>(null);
 
     const titleInView = useInView(sectionRef, { amount: 0.1, once: true });
@@ -225,4 +225,4 @@ const EducationSection = () => {
     );
 };
 
-export default EducationSection;
+export default Education;

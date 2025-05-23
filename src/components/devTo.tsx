@@ -53,7 +53,7 @@ interface DevToSectionProps {
     loadMoreCount?: number;
 }
 
-const DevToSection: React.FC<DevToSectionProps> = ({
+const DevTo: React.FC<DevToSectionProps> = ({
     username,
     initialDisplayCount = 3,
     loadMoreCount = 3
@@ -227,4 +227,4 @@ const DevToSection: React.FC<DevToSectionProps> = ({
     );
 };
 
-export default DevToSection;
+export default DevTo;

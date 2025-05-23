@@ -13,7 +13,7 @@ type FormValues = {
     phone?: string; // Optional phone
 };
 
-const ContactForm = () => {
+const Contact = () => {
     const [formData, setFormData] = useState<FormValues>({ name: "", email: "", message: "", phone: "" });
     const [formState, setFormState] = useState<FormState>("idle");
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -197,4 +197,4 @@ const ContactForm = () => {
     );
 };
 
-export default ContactForm;
+export default Contact;

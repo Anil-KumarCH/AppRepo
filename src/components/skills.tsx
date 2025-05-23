@@ -152,7 +152,7 @@ const SceneContent = React.memo(({
 SceneContent.displayName = "SceneContent";
 
 // --- Main Component ---
-const SkillNebulaV3 = () => {
+const Skills = () => {
     const titleRef = useRef<HTMLHeadingElement>(null);
     const [hoveredId, setHoveredId] = useState<string | null>(null);
     const [selectedSkill, setSelectedSkill] = useState<SkillData3D | null>(null);
@@ -283,4 +283,4 @@ const SkillNebulaV3 = () => {
     );
 };
 
-export default SkillNebulaV3; // You might want to rename this to SkillNebula
+export default Skills; // You might want to rename this to SkillNebula

@@ -18,12 +18,12 @@ interface MenuItem {
 const menuItems: MenuItem[] = [
     { name: "Home", icon: FaHome, link: "#Hero" },
     { name: "About", icon: FaUser, link: "#AboutMe" },
-    { name: "Education", icon: FaGraduationCap, link: "#EducationSection" },
-    { name: "Projects", icon: FaBriefcase, link: "#ProjectsSection" },
-    { name: "Skills", icon: FaChartLine, link: "#SkillNebulaV3" },
-    { name: "LinkedIn", icon: FaLinkedin, link: "#LinkedInInsights" },
-    { name: "Dev.to", icon: FaDev, link: "#DevToSection" },
-    { name: "Contact", icon: FaEnvelope, link: "#ContactForm" },
+    { name: "Education", icon: FaGraduationCap, link: "#Education" },
+    { name: "Projects", icon: FaBriefcase, link: "#Projects" },
+    { name: "Skills", icon: FaChartLine, link: "#Skills" },
+    { name: "LinkedIn", icon: FaLinkedin, link: "#LinkedIn" },
+    { name: "Dev.to", icon: FaDev, link: "#DevTo" },
+    { name: "Contact", icon: FaEnvelope, link: "#Contact" },
 ];
 
 const Navbar = () => {

@@ -10,7 +10,7 @@ interface FeedbackModalProps {
   googleFormUrl: string; // You will provide this
 }
 
-const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, googleFormUrl }) => {
+const Feedback: React.FC<FeedbackModalProps> = ({ isOpen, onClose, googleFormUrl }) => {
   const backdropVariants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1, transition: { duration: 0.3 } },
@@ -68,4 +68,4 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, googleFo
   );
 };
 
-export default FeedbackModal;
+export default Feedback;

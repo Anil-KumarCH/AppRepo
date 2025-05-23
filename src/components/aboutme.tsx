@@ -20,7 +20,7 @@ const aboutMeTabsData = [
     },
 ];
 
-export default function AboutMeSection() {
+export default function AboutMe() {
     // Initialize with the ID of the first tab to ensure consistent initial server/client state
     const [activeTab, setActiveTab] = useState(aboutMeTabsData[0].id);
 

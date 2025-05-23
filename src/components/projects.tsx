@@ -152,7 +152,7 @@ const projects: Project[] = [
     },
 ];
 
-export default function ProjectsSection() {
+export default function Projects() {
     const [selectedIndex, setSelectedIndex] = useState(0);
     const [showFullDetails, setShowFullDetails] = useState(false);
     const titleRef = useRef<HTMLHeadingElement>(null);
