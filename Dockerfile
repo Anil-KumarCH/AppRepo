@@ -11,7 +11,7 @@ RUN npm install -force
 # Copying the rest of the application code to the working directory. This should be done after npm install to take advantage of Docker's caching mechanism.
 COPY . .
 # Building the application. The build command will create a .next directory with the production build of the application.
-RUN npm run build
+#RUN npm run build
 
 #Production environment#
 #Node image with Alpine Linux for a smaller footprint
