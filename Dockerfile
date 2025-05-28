@@ -1,35 +1,68 @@
-# Node image with Alpine Linux for a smaller footprint
-# Using the official Node.js image as a base image
+# Dockerfile for Next.js Application
+
+# ---- Stage 1: Build Stage ----
+# Use an official Node.js image as a parent image.
+# Alpine versions are lightweight. Choose a version compatible with your Next.js app.
 FROM node:18-alpine AS builder
 
-# Set the working directory in the container
+# Set the working directory in the container.
 WORKDIR /app
-#Copy package.json and package-lock.json to the working directory. This allows Docker to cache the npm install step, so it doesn't have to run every time you build the image.
+
+# Copy package.json and package-lock.json (or yarn.lock) first
+# This leverages Docker's caching. If these files haven't changed,
+# Docker won't re-run npm install.
 COPY package*.json ./
-#Installing the dependencies defined in package.json. The --frozen-lockfile flag ensures that the exact versions in package-lock.json are installed, preventing any changes to the lock file.
-RUN npm install -force
-# Copying the rest of the application code to the working directory. This should be done after npm install to take advantage of Docker's caching mechanism.
+
+# Install dependencies.
+# Consider removing --force if possible by fixing peer dependencies
+RUN npm install --force 
+
+# Copy the rest of your application's code into the container.
 COPY . .
-# Building the application. The build command will create a .next directory with the production build of the application.
+
+# Build the Next.js application for production.
 RUN npm run build
 
-#Production environment#
-#Node image with Alpine Linux for a smaller footprint
-FROM node:18-alpine AS runner
-# Set the working directory in the container
-WORKDIR /app
-#Setting the environment variable to production. This is important for Next.js to optimize the build for production.
-ENV NODE_ENV=production
-#Setting the HOSTNAME env to 0.0.0.0 so that the server can be accessed from any IP address. This is useful when running the container in a cloud environment or on a server.
-ENV HOSTNAME=0.0.0.0
-#Exposing port 3000, which is the default port for Next.js applications. This allows external access to the application running inside the container.
-EXPOSE 3000
-#Copying standalone server from the builder stage. The standalone server is a self-contained version of the Next.js application that can be run without any additional dependencies.
-COPY --from=builder /src/ .next/standalone ./
-#Copying the Next.js static files from the builder stage. These files are necessary for serving the application.
-COPY --from=builder /src/ .next/static ./.next/static/
-#Copying the public directory from the builder stage. This directory typically contains static assets like images, fonts, etc.
-COPY --from=builder /public ./public/
-#Running the commands at the time of container startup. This command starts the Next.js server using the standalone build.
-CMD [ "node", "server.js" ]
+# ---- DEBUGGING STEPS: To verify contents of the builder stage ----
+RUN echo "---- Listing contents of /app in builder stage ----" && ls -la /app
+RUN echo "---- Listing contents of /app/.next in builder stage ----" && ls -la /app/.next
+RUN echo "---- Listing contents of /app/.next/standalone in builder stage (if it exists) ----"
+RUN ls -la /app/.next/standalone || echo "/app/.next/standalone NOT FOUND in builder. CHECK next.config.js for 'output: \"standalone\"'."
+RUN echo "---- Listing contents of /app/public in builder stage (if it exists) ----"
+RUN ls -la /app/public || echo "/app/public NOT FOUND in builder"
+RUN echo "---- End of Debug Listings ----"
+# ---- END DEBUGGING STEPS ----
 
+# ---- Stage 2: Production Stage ----
+# Use a lean Node.js Alpine image for the production environment.
+FROM node:18-alpine AS runner
+
+# Set the working directory.
+WORKDIR /app
+
+# Set environment to production.
+ENV NODE_ENV=production
+# Set HOSTNAME for Next.js server to listen on all interfaces within Docker
+ENV HOSTNAME 0.0.0.0
+# Expose port 3000 (standard Next.js port)
+EXPOSE 3000
+
+# If 'output: "standalone"' is correctly configured in next.config.js,
+# the .next/standalone directory will contain everything needed to run the app,
+# including a minimal server.js, necessary node_modules, and copies of .next/static and public.
+
+# Copy the entire standalone output directory from the builder stage.
+# Source path MUST be /app/.next/standalone because WORKDIR in builder was /app
+COPY --from=builder /app/.next/standalone ./
+
+# Copy the public folder from the builder stage.
+# The standalone output mode should copy the public folder into .next/standalone/public,
+# and server.js should serve it from there.
+# However, if your server.js or app expects 'public' at the root of WORKDIR,
+# you might need this. Test without it first if using standalone output.
+# If needed, the correct source path is /app/public
+COPY --from=builder /app/public ./public
+
+# The CMD should point to the server.js within the copied standalone directory.
+# This server.js is generated by Next.js when output: 'standalone' is used.
+CMD ["node", "server.js"]
