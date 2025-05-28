@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Hero from "../components/hero";
 import AboutMe from "../components/aboutme"; // Corrected: Assuming default export based on previous context
 import Projects from "../components/projects";

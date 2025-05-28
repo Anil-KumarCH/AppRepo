@@ -75,7 +75,7 @@ const DevTo: React.FC<DevToSectionProps> = ({
                     try {
                         const errorData = await response.json();
                         errorMsg = errorData.error || errorMsg;
-                    } catch (_) { /* Ignore if error body isn't JSON */ }
+                    } catch (parseError) { console.warn("Could not parse error response from Dev.to API:", parseError); }
                     throw new Error(errorMsg);
                 }
                 const data: DevToArticle[] = await response.json();
@@ -150,7 +150,7 @@ const DevTo: React.FC<DevToSectionProps> = ({
     if (!loading && allArticles.length === 0) {
         return (
             <div className="info-container">
-                <p>No articles found for "{username}" on Dev.to at the moment.</p>
+                <p>No articles found for {username} on Dev.to at the moment.</p>
             </div>
         );
     }

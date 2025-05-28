@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useState, useRef, useMemo, Suspense, useEffect, useCallback } from "react";
+import React, { useState, useRef, useMemo, useEffect, useCallback } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Text, Billboard } from "@react-three/drei";
 import { motion } from "framer-motion-3d";
 import { useMotionValue, useSpring, motion as motion2d, AnimatePresence } from "framer-motion";
 import * as THREE from "three";
-import { Star, GitBranch, Github, RefreshCw, Settings, Box, Ship, Combine, CloudCog, Workflow, Users, CheckCircle, TerminalSquare as DevOpsIcon, Activity, XCircle, Zap, Network } from "lucide-react";
+import { Star, Github, RefreshCw, Settings, Box, Ship, Combine, CloudCog, Workflow, Users, CheckCircle, TerminalSquare as DevOpsIcon, XCircle,} from "lucide-react";
 
 // --- Data Structure ---
 interface SkillData3D {

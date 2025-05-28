@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useRef, FormEvent } from "react";
+import React, { useState, FormEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Loader, CheckCircle, AlertCircle } from "lucide-react";
+import { Send, Loader2 as Loader, CheckCircle, AlertCircle } from "lucide-react";
 
 // Form state type
 type FormState = "idle" | "loading" | "success" | "error";
@@ -56,10 +56,14 @@ const Contact = () => {
             // Reset state after a few seconds
             setTimeout(() => setFormState("idle"), 4000);
 
-        } catch (error: any) {
+        } catch (error) {
             console.error("Contact form submission error:", error);
             setFormState("error");
-            setErrorMessage(error.message || "An unexpected error occurred.");
+            setErrorMessage(
+                error instanceof Error
+                    ? error.message
+                    : "An unexpected error occurred."
+            );
             // Don't reset automatically on error, let user retry
              setTimeout(() => setFormState("idle"), 5000); // Reset after longer period
         }

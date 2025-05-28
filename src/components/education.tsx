@@ -9,7 +9,7 @@ import {
     MotionValue,
     useSpring,
 } from "framer-motion";
-import { Milestone, CircleDot, Building, Code } from "lucide-react";
+import { CircleDot, Building, Code } from "lucide-react";
 
 interface EducationItem {
     id: number;
