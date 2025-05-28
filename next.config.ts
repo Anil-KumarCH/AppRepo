@@ -25,24 +25,21 @@ const nextConfig: NextConfig = {
     return config;
   },
 
-  // --- ADDED: Options to ignore ESLint and TypeScript errors during build ---
-  // Use these if you need your CI/CD pipeline (Jenkins) to pass while you work on fixing the errors.
-  // It's recommended to remove these once the underlying code issues are resolved.
+  // --- Options to ignore ESLint and TypeScript errors during build ---
   eslint: {
-    // Warning: This allows production builds to successfully complete even if
-    // your project has ESLint errors.
     ignoreDuringBuilds: true,
   },
   typescript: {
-    // Warning: This allows production builds to successfully complete even if
-    // your project has type errors.
     ignoreBuildErrors: true,
   },
   // --- End of added options ---
 
+  // --- THIS IS THE IMPORTANT FIX ---
+  // Ensure this line is present and uncommented
+  output: 'standalone',
+  // --- END OF IMPORTANT FIX ---
+
   // Add any other Next.js configurations you need here
-  // For example, if you were using 'output: standalone' for Docker:
-  // output: 'standalone',
 };
 
 export default nextConfig;
