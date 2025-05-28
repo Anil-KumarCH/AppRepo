@@ -25,11 +25,11 @@ ENV HOSTNAME=0.0.0.0
 #Exposing port 3000, which is the default port for Next.js applications. This allows external access to the application running inside the container.
 EXPOSE 3000
 #Copying standalone server from the builder stage. The standalone server is a self-contained version of the Next.js application that can be run without any additional dependencies.
-COPY --from=builder /app/ .next/standalone ./
+COPY --from=builder /src/ .next/standalone ./
 #Copying the Next.js static files from the builder stage. These files are necessary for serving the application.
-COPY --from=builder /app/ .next/static ./.next/static/
+COPY --from=builder /src/ .next/static ./.next/static/
 #Copying the public directory from the builder stage. This directory typically contains static assets like images, fonts, etc.
-COPY --from=builder /app/public ./public/
+COPY --from=builder /public ./public/
 #Running the commands at the time of container startup. This command starts the Next.js server using the standalone build.
 CMD [ "node", "server.js" ]
 
