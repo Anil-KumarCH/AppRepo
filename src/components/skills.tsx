@@ -9,6 +9,9 @@ import type { PanInfo } from "framer-motion"; // Ensure PanInfo is imported
 import * as THREE from "three";
 import { Star, Github, RefreshCw, Settings, Box, Ship, Combine, CloudCog, Workflow, Users, CheckCircle, TerminalSquare as DevOpsIcon, XCircle,} from "lucide-react";
 
+// --- Type Aliases ---
+type FramerMotionEvent = MouseEvent | TouchEvent | PointerEvent;
+
 // --- Data Structure ---
 interface SkillData3D {
     id: string;
@@ -17,7 +20,7 @@ interface SkillData3D {
     rating: number;
     details: string;
     category: 'Methodology' | 'Version Control' | 'CI/CD & Automation' | 'Code Quality' | 'Containers & Orchestration' | 'Cloud Platform';
-    position?: [number, number, number]; // Made optional as it's calculated
+    position?: [number, number, number];
 }
 
 // --- Skills Data ---
@@ -50,7 +53,7 @@ const MOBILE_BREAKPOINT = 880;
 
 // --- Helper: Spherical Coords ---
 function getSphericalPosition(index: number, count: number, radius: number): [number, number, number] {
-    const phi = Math.acos(-1 + (2 * index) / (Math.max(1, count - 1) || 1)); // Ensure denominator is not zero
+    const phi = Math.acos(-1 + (2 * index) / (Math.max(1, count - 1) || 1));
     const theta = Math.sqrt(Math.max(1, count) * Math.PI) * phi;
     const x = radius * Math.sin(phi) * Math.cos(theta);
     const y = radius * Math.sin(phi) * Math.sin(theta);
@@ -79,15 +82,14 @@ const RatingStarsHTML = ({ rating }: { rating: number }) => (
     </div>
 );
 
-// Define a more specific type for the skill prop in SkillNode3D if position is guaranteed by positionedSkills
 interface PositionedSkillData3D extends SkillData3D {
     position: [number, number, number];
 }
 
 const SkillNode3D = ({ skill, onHover, onClick, isHovered, isSelected }: {
-    skill: PositionedSkillData3D; // Use the more specific type
+    skill: PositionedSkillData3D;
     onHover: (id: string | null) => void;
-    onClick: (skill: SkillData3D) => void; // Can remain SkillData3D or be PositionedSkillData3D
+    onClick: (skill: SkillData3D) => void;
     isHovered: boolean;
     isSelected: boolean;
 }) => {
@@ -110,7 +112,7 @@ const SceneContent = React.memo(({
     positionedSkills, isPaused, rotationY, smoothRotationY,
     onHover, onClick, selectedSkill, hoveredId, sphereRadius, wireframeOpacity
 }: {
-    positionedSkills: PositionedSkillData3D[]; // Use the more specific type
+    positionedSkills: PositionedSkillData3D[];
     isPaused: boolean;
     rotationY: ReturnType<typeof useMotionValue<number>>;
     smoothRotationY: ReturnType<typeof useSpring>;
@@ -122,7 +124,7 @@ const SceneContent = React.memo(({
     wireframeOpacity: number;
 }) => {
     const groupRef = useRef<THREE.Group>(null!);
-    useFrame((_state, delta) => { // _state if not used
+    useFrame((_state, delta) => {
         if (!isPaused && groupRef.current) {
             const currentY = rotationY.get();
             const speedRadPerSec = THREE.MathUtils.degToRad(BASE_ROTATION_SPEED_DPS);
@@ -219,7 +221,7 @@ const Skills = () => {
     
     const handleDragStart = (
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        _event?: MouseEvent | TouchEvent | PointerEvent,
+        _event?: FramerMotionEvent,
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         _info?: PanInfo
     ) => { 
@@ -230,7 +232,7 @@ const Skills = () => {
     
     const handleDrag = (
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        _event: MouseEvent | TouchEvent | PointerEvent,
+        _event: FramerMotionEvent,
         info: PanInfo
     ) => {
         rotationY.set(dragStartRotation.current + info.offset.x * DRAG_SENSITIVITY);
@@ -238,7 +240,7 @@ const Skills = () => {
 
     const handleDragEnd = (
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        _event?: MouseEvent | TouchEvent | PointerEvent,
+        _event?: FramerMotionEvent,
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         _info?: PanInfo
     ) => { 
