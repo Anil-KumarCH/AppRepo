@@ -192,7 +192,7 @@ const Contact = () => {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -10 }}
                          >
-                            Thanks for reaching out! I'll get back to you soon.
+                            Thanks for reaching out! I&apos;ll get back to you soon.
                          </motion.p>
                      )}
                  </AnimatePresence>

@@ -25,19 +25,19 @@ const nextConfig: NextConfig = {
     return config;
   },
 
-  // --- Options to ignore ESLint and TypeScript errors during build ---
+  // --- IMPORTANT: Errors are no longer ignored during builds ---
+  // This will help you identify underlying issues in your code.
+  // The default behavior is to not ignore these errors.
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false, // Changed from true
   },
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false, // Changed from true
   },
-  // --- End of added options ---
+  // --- End of important change ---
 
-  // --- THIS IS THE IMPORTANT FIX ---
-  // Ensure this line is present and uncommented
+  // This ensures Next.js outputs a standalone build for Docker
   output: 'standalone',
-  // --- END OF IMPORTANT FIX ---
 
   // Add any other Next.js configurations you need here
 };

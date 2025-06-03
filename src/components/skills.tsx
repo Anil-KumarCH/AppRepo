@@ -5,6 +5,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { Text, Billboard } from "@react-three/drei";
 import { motion } from "framer-motion-3d";
 import { useMotionValue, useSpring, motion as motion2d, AnimatePresence } from "framer-motion";
+import type { PanInfo } from "framer-motion"; // Ensure PanInfo is imported
 import * as THREE from "three";
 import { Star, Github, RefreshCw, Settings, Box, Ship, Combine, CloudCog, Workflow, Users, CheckCircle, TerminalSquare as DevOpsIcon, XCircle,} from "lucide-react";
 
@@ -16,7 +17,7 @@ interface SkillData3D {
     rating: number;
     details: string;
     category: 'Methodology' | 'Version Control' | 'CI/CD & Automation' | 'Code Quality' | 'Containers & Orchestration' | 'Cloud Platform';
-    position?: [number, number, number];
+    position?: [number, number, number]; // Made optional as it's calculated
 }
 
 // --- Skills Data ---
@@ -49,7 +50,7 @@ const MOBILE_BREAKPOINT = 880;
 
 // --- Helper: Spherical Coords ---
 function getSphericalPosition(index: number, count: number, radius: number): [number, number, number] {
-    const phi = Math.acos(-1 + (2 * index) / (Math.max(1, count - 1)));
+    const phi = Math.acos(-1 + (2 * index) / (Math.max(1, count - 1) || 1)); // Ensure denominator is not zero
     const theta = Math.sqrt(Math.max(1, count) * Math.PI) * phi;
     const x = radius * Math.sin(phi) * Math.cos(theta);
     const y = radius * Math.sin(phi) * Math.sin(theta);
@@ -62,7 +63,7 @@ const useIsMobile = (breakpoint = MOBILE_BREAKPOINT) => {
     const [isMobile, setIsMobile] = useState(false);
     useEffect(() => {
         const checkScreenSize = () => setIsMobile(window.innerWidth < breakpoint);
-        if (typeof window !== "undefined") { // Ensure window is available
+        if (typeof window !== "undefined") {
             checkScreenSize();
             window.addEventListener('resize', checkScreenSize);
             return () => window.removeEventListener('resize', checkScreenSize);
@@ -78,10 +79,15 @@ const RatingStarsHTML = ({ rating }: { rating: number }) => (
     </div>
 );
 
+// Define a more specific type for the skill prop in SkillNode3D if position is guaranteed by positionedSkills
+interface PositionedSkillData3D extends SkillData3D {
+    position: [number, number, number];
+}
+
 const SkillNode3D = ({ skill, onHover, onClick, isHovered, isSelected }: {
-    skill: SkillData3D & { position: [number, number, number] };
+    skill: PositionedSkillData3D; // Use the more specific type
     onHover: (id: string | null) => void;
-    onClick: (skill: SkillData3D) => void;
+    onClick: (skill: SkillData3D) => void; // Can remain SkillData3D or be PositionedSkillData3D
     isHovered: boolean;
     isSelected: boolean;
 }) => {
@@ -90,6 +96,7 @@ const SkillNode3D = ({ skill, onHover, onClick, isHovered, isSelected }: {
     const nodeRef = useRef<THREE.Group>(null!);
     useFrame(({ camera }) => { if (nodeRef.current) nodeRef.current.lookAt(camera.position); });
     return (
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         <motion.group ref={nodeRef} position={skill.position} onPointerOver={(e) => { e.stopPropagation(); onHover(skill.id); }} onPointerOut={() => onHover(null)} onClick={(e) => { e.stopPropagation(); onClick(skill); }} animate={{ scale }} transition={{ type: 'spring', stiffness: 200, damping: 15 }} {...({} as any)}>
             <Billboard>
                 <Text fontSize={0.23} color={color} anchorX="center" anchorY="middle" outlineWidth={0.012} outlineColor="#0a0a12" maxWidth={1.9}>{skill.name}</Text>
@@ -103,7 +110,7 @@ const SceneContent = React.memo(({
     positionedSkills, isPaused, rotationY, smoothRotationY,
     onHover, onClick, selectedSkill, hoveredId, sphereRadius, wireframeOpacity
 }: {
-    positionedSkills: (SkillData3D & { position: [number, number, number] })[];
+    positionedSkills: PositionedSkillData3D[]; // Use the more specific type
     isPaused: boolean;
     rotationY: ReturnType<typeof useMotionValue<number>>;
     smoothRotationY: ReturnType<typeof useSpring>;
@@ -115,7 +122,7 @@ const SceneContent = React.memo(({
     wireframeOpacity: number;
 }) => {
     const groupRef = useRef<THREE.Group>(null!);
-    useFrame((state, delta) => {
+    useFrame((_state, delta) => { // _state if not used
         if (!isPaused && groupRef.current) {
             const currentY = rotationY.get();
             const speedRadPerSec = THREE.MathUtils.degToRad(BASE_ROTATION_SPEED_DPS);
@@ -128,13 +135,13 @@ const SceneContent = React.memo(({
             <ambientLight intensity={0.75} />
             <pointLight position={[10, 15, 10]} intensity={1.1} castShadow />
             <pointLight position={[-10, -5, -15]} intensity={0.4} color="#b0c4ff" />
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
             <motion.group ref={groupRef} rotation-y={smoothRotationY} {...({} as any)}>
                 <mesh scale={sphereRadius} renderOrder={-1}>
                     <sphereGeometry args={[1, 24, 24]} />
-                    {/* *** MODIFIED WIREFRAME MATERIAL FOR VISIBILITY *** */}
                     <meshStandardMaterial 
                         wireframe 
-                        color="#607D8B" /* A mid-tone blue-gray, adjust as needed */
+                        color="#607D8B"
                         opacity={wireframeOpacity} 
                         transparent 
                         depthWrite={false} 
@@ -163,37 +170,35 @@ const Skills = () => {
 
     const [sphereRadius, setSphereRadius] = useState(BASE_SPHERE_RADIUS);
     const [cameraZ, setCameraZ] = useState(BASE_SPHERE_RADIUS * 2.5);
-    // *** INCREASED WIREFRAME OPACITY DEFAULTS ***
-    const [wireframeOpacity, setWireframeOpacity] = useState(0.35); // Default more visible
+    const [wireframeOpacity, setWireframeOpacity] = useState(0.35);
 
     const rotationY = useMotionValue(0);
     const smoothRotationY = useSpring(rotationY, { stiffness: 100, damping: 30, mass: 0.5, restDelta: 0.001 });
 
     const isPaused = hoveredId !== null || selectedSkill !== null || isDragging || detailViewActive;
 
-    const positionedSkills = useMemo(() => {
+    const positionedSkills: PositionedSkillData3D[] = useMemo(() => {
         const count = skillsData.length;
         return skillsData.map((skill, i) => ({
             ...skill,
             position: getSphericalPosition(i, count, sphereRadius),
-            category: skill.category || "Default",
         }));
     }, [sphereRadius]);
 
     useEffect(() => {
         const handleResize = () => {
             const width = window.innerWidth;
-            if (width < MOBILE_BREAKPOINT) { // Mobile
+            if (width < MOBILE_BREAKPOINT) {
                 setSphereRadius(BASE_SPHERE_RADIUS * 0.75);
                 setCameraZ(BASE_SPHERE_RADIUS * 3.0);
-                setWireframeOpacity(0.2); // Adjusted mobile opacity
-            } else { // Desktop
+                setWireframeOpacity(0.2);
+            } else {
                 setSphereRadius(BASE_SPHERE_RADIUS);
                 setCameraZ(BASE_SPHERE_RADIUS * 2.5);
-                setWireframeOpacity(0.35); // Keep it more visible on desktop
+                setWireframeOpacity(0.35);
             }
         };
-        if (typeof window !== "undefined") { // Ensure window is available
+        if (typeof window !== "undefined") {
             handleResize();
             window.addEventListener('resize', handleResize);
             return () => window.removeEventListener('resize', handleResize);
@@ -211,27 +216,52 @@ const Skills = () => {
     const handleCloseDetails = useCallback(() => { setDetailViewActive(false); setSelectedSkill(null); }, []);
 
     const dragStartRotation = useRef(0);
-    const handleDragStart = () => { setIsDragging(true); dragStartRotation.current = rotationY.get(); smoothRotationY.stop(); };
-    const handleDrag = (event: any, info: { offset: { x: number; y: number } }) => rotationY.set(dragStartRotation.current + info.offset.x * DRAG_SENSITIVITY);
-    const handleDragEnd = () => { setIsDragging(false); };
+    
+    const handleDragStart = (
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        _event?: MouseEvent | TouchEvent | PointerEvent,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        _info?: PanInfo
+    ) => { 
+        setIsDragging(true); 
+        dragStartRotation.current = rotationY.get(); 
+        smoothRotationY.stop(); 
+    };
+    
+    const handleDrag = (
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        _event: MouseEvent | TouchEvent | PointerEvent,
+        info: PanInfo
+    ) => {
+        rotationY.set(dragStartRotation.current + info.offset.x * DRAG_SENSITIVITY);
+    };
+
+    const handleDragEnd = (
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        _event?: MouseEvent | TouchEvent | PointerEvent,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        _info?: PanInfo
+    ) => { 
+        setIsDragging(false); 
+    };
 
     const [titleInView, setTitleInView] = useState(false);
     useEffect(() => {
         const observer = new IntersectionObserver(([entry]) => setTitleInView(entry.isIntersecting), { threshold: 0.1 });
-        const currentTitleRef = titleRef.current; // Capture ref value
+        const currentTitleRef = titleRef.current;
         if (currentTitleRef) observer.observe(currentTitleRef);
         return () => { if (currentTitleRef) observer.unobserve(currentTitleRef); };
     }, []);
 
     const canvasContainerVariants = {
         center: { x: "0%", width: "100%", transition: { type: "spring", stiffness: 100, damping: 20 } },
-        desktopAside: { x: "-20%", width: "60%", transition: { type: "spring", stiffness: 100, damping: 20 } }, // Shift further left
-        mobileAside: { y: "-20%", height: "45%", scale: 0.85, transition: { type: "spring", stiffness: 100, damping: 20 } } // Move further up
+        desktopAside: { x: "-20%", width: "60%", transition: { type: "spring", stiffness: 100, damping: 20 } },
+        mobileAside: { y: "-20%", height: "45%", scale: 0.85, transition: { type: "spring", stiffness: 100, damping: 20 } }
     };
     const detailsPanelVariants = {
-        hidden: (isMobileView: boolean) => ({ opacity: 0, ...(isMobileView ? { y: "100%" } : { x: "100%" }) }),
-        visible: (isMobileView: boolean) => ({ opacity: 1, y: "0%", x: "0%", transition: { type: "spring", stiffness: 100, damping: 20, delay: 0.1 } }),
-        exit: (isMobileView: boolean) => ({ opacity: 0, ...(isMobileView ? { y: "100%" } : { x: "100%" }), transition: { duration: 0.25, ease: "easeIn" } })
+        hidden: (isMobileParam: boolean) => ({ opacity: 0, ...(isMobileParam ? { y: "100%" } : { x: "100%" }) }),
+        visible: () => ({ opacity: 1, y: "0%", x: "0%", transition: { type: "spring", stiffness: 100, damping: 20, delay: 0.1 } }),
+        exit: (isMobileParam: boolean) => ({ opacity: 0, ...(isMobileParam ? { y: "100%" } : { x: "100%" }), transition: { duration: 0.25, ease: "easeIn" } })
     };
 
     const currentCanvasVariant = detailViewActive ? (isMobile ? "mobileAside" : "desktopAside") : "center";
@@ -283,4 +313,4 @@ const Skills = () => {
     );
 };
 
-export default Skills; // You might want to rename this to SkillNebula
+export default Skills;

@@ -1,13 +1,16 @@
+// tailwind.config.js
 module.exports = {
   content: [
-    "./app/**/*.{js,ts,jsx,tsx}",
-    "./pages/**/*.{js,ts,jsx,tsx}",
-    "./components/**/*.{js,ts,jsx,tsx}",
+    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",      // Added /src and mdx
+    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",   // Added /src and mdx
+    "./src/components/**/*.{js,ts,jsx,tsx,mdx}", // Added /src and mdx
+    // If you have other top-level directories using Tailwind, add them too:
+    // "./public/**/*.html",
   ],
   theme: {
     extend: {
       fontFamily: {
-        cursive: ["Dancing Script", "cursive"], // or any other cursive font
+        cursive: ["Dancing Script", "cursive"],
       },
       maxWidth: {
         'full': '100%',

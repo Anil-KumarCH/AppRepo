@@ -40,7 +40,7 @@ export default function Hero() {
             transition={{ duration: 2 }}
             className="hero-text"
           >
-            I'm Anil Kumar Choppadandi
+            I&apos;m Anil Kumar Choppadandi
           </motion.h1>
         )}
         {step === 2 && (
