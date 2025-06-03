@@ -8,28 +8,36 @@ FROM node:18-alpine AS builder
 # Set the working directory in the container.
 WORKDIR /app
 
-# Copy package.json and package-lock.json (or yarn.lock) first
+# Copy package.json and package-lock.json (or yarn.lock) first.
 # This leverages Docker's caching. If these files haven't changed,
 # Docker won't re-run npm install.
 COPY package*.json ./
 
 # Install dependencies.
-# Consider removing --force if possible by fixing peer dependencies
-RUN npm install --force 
+# Consider removing --force if possible by fixing peer dependencies in your package.json.
+# Using --force can hide underlying issues that might affect the build or runtime.
+RUN npm install --force
 
-# Copy the rest of your application's code into the container.
+# Copy the rest of your application's source code into the container.
+# Ensure you have a .dockerignore file to exclude node_modules, .next, .git, etc., from the build context.
 COPY . .
 
 # Build the Next.js application for production.
+# This step will also bundle your CSS (e.g., from styles/globals.css if imported in layout.tsx).
 RUN npm run build
 
 # ---- DEBUGGING STEPS: To verify contents of the builder stage ----
+# These are helpful for diagnosing issues during the build.
 RUN echo "---- Listing contents of /app in builder stage ----" && ls -la /app
 RUN echo "---- Listing contents of /app/.next in builder stage ----" && ls -la /app/.next
-RUN echo "---- Listing contents of /app/.next/standalone in builder stage (if it exists) ----"
-RUN ls -la /app/.next/standalone || echo "/app/.next/standalone NOT FOUND in builder. CHECK next.config.js for 'output: \"standalone\"'."
-RUN echo "---- Listing contents of /app/public in builder stage (if it exists) ----"
-RUN ls -la /app/public || echo "/app/public NOT FOUND in builder"
+RUN echo "---- Listing contents of /app/.next/standalone in builder stage (if it exists) ----" && \
+    (ls -la /app/.next/standalone || echo "/app/.next/standalone NOT FOUND in builder. CHECK next.config.js for 'output: \"standalone\"'.")
+RUN echo "---- Listing contents of /app/.next/standalone/.next/static in builder stage (if standalone exists) ----" && \
+    (ls -la /app/.next/standalone/.next/static || echo "/app/.next/standalone/.next/static NOT FOUND in builder.")
+RUN echo "---- Listing contents of /app/.next/standalone/public in builder stage (if standalone exists and packages public) ----" && \
+    (ls -la /app/.next/standalone/public || echo "/app/.next/standalone/public NOT FOUND in builder. This is okay if server.js serves from a root public dir.")
+RUN echo "---- Listing contents of /app/public in builder stage (original public folder) ----" && \
+    (ls -la /app/public || echo "/app/public NOT FOUND in builder")
 RUN echo "---- End of Debug Listings ----"
 # ---- END DEBUGGING STEPS ----
 
@@ -40,28 +48,34 @@ FROM node:18-alpine AS runner
 # Set the working directory.
 WORKDIR /app
 
-# Set environment to production.
+# Set environment to production for Next.js.
 ENV NODE_ENV=production
-# Set HOSTNAME for Next.js server to listen on all interfaces within Docker
-ENV HOSTNAME 0.0.0.0
-# Expose port 3000 (standard Next.js port)
+# Set HOSTNAME for Next.js server to listen on all interfaces within Docker.
+# Use key=value format for ENV.
+ENV HOSTNAME=0.0.0.0
+# Standard Next.js port.
 EXPOSE 3000
 
-# If 'output: "standalone"' is correctly configured in next.config.js,
-# the .next/standalone directory will contain everything needed to run the app,
-# including a minimal server.js, necessary node_modules, and copies of .next/static and public.
+# Create a non-root user and group for better security.
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
 
-# Copy the entire standalone output directory from the builder stage.
-# Source path MUST be /app/.next/standalone because WORKDIR in builder was /app
-COPY --from=builder /app/.next/standalone ./
+# Copy the standalone output from the builder stage.
+# The `output: "standalone"` feature in next.config.js creates a self-contained
+# directory in .next/standalone that includes server.js, minimal node_modules,
+# and static assets (including CSS and JS chunks from .next/static, and public assets).
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 
-# Copy the public folder from the builder stage.
-# The standalone output mode should copy the public folder into .next/standalone/public,
-# and server.js should serve it from there.
-# However, if your server.js or app expects 'public' at the root of WORKDIR,
-# you might need this. Test without it first if using standalone output.
-# If needed, the correct source path is /app/public
-COPY --from=builder /app/public ./public
+# The standalone output should correctly package and serve assets from the public directory.
+# An explicit copy of the original public folder is usually not needed and can cause issues
+# if it conflicts with how the standalone server.js expects to find assets.
+# If assets from `public` are missing, first verify the contents of `/app/.next/standalone/public`
+# in the builder stage. If Next.js didn't package them there, then you might need to
+# copy them from the builder's `/app/public` to `/app/public` in this runner stage,
+# but this is less common for a properly configured standalone output.
+
+# Switch to the non-root user.
+USER nextjs
 
 # The CMD should point to the server.js within the copied standalone directory.
 # This server.js is generated by Next.js when output: 'standalone' is used.
