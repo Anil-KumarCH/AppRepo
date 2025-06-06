@@ -4,13 +4,17 @@
 FROM node:18-alpine AS builder
 WORKDIR /app
 COPY package*.json ./
+# Consider removing --force by resolving peer dependency issues
 RUN npm install --force
 COPY . .
+# Ensure .dockerignore is properly set up to exclude unnecessary files
 RUN npm run build
 
 # ---- Stage 2: Production Stage ----
 FROM node:18-alpine AS runner
-WORKDIR /app
+
+# Set a working directory for the app
+WORKDIR /home/app
 
 ENV NODE_ENV=production
 ENV HOSTNAME=0.0.0.0
@@ -20,32 +24,29 @@ EXPOSE 3000
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# Copy standalone output (server.js, minimal node_modules)
-COPY --from=builder /app/.next/standalone ./
+# Copy the standalone application files from the builder stage
+# This includes server.js, minimal node_modules, and the .next folder (with server components etc.)
+# Ownership is set to the nextjs user during the copy.
+COPY --chown=nextjs:nodejs --from=builder /app/.next/standalone /home/app/
 
-# Copy public assets
-COPY --from=builder /app/public ./public
+# Copy the public assets from the builder stage
+COPY --chown=nextjs:nodejs --from=builder /app/public /home/app/public
 
-# Copy static build assets (.next/static)
-COPY --from=builder /app/.next/static ./.next/static
+# Copy the static build assets (.next/static) from the builder stage
+# These are essential for CSS, JS chunks, fonts, etc.
+COPY --chown=nextjs:nodejs --from=builder /app/.next/static /home/app/.next/static
 
-# Create the .next/cache directory and set permissions
-# This directory is needed by Next.js at runtime for image optimization and other caching.
-# Ensure the nextjs user can write to it.
-RUN mkdir -p ./.next/cache && \
-    chown -R nextjs:nodejs ./.next
-
-# Change ownership of other necessary copied assets to the nextjs user
-# This is important if these directories/files are created by root during COPY
-# and nextjs user needs to interact with them (though mostly read for public/static).
-RUN chown -R nextjs:nodejs ./public && \
-    chown -R nextjs:nodejs ./standalone_nodejs_modules || true # standalone_nodejs_modules may not exist if not using older next versions
-
-# If you have a custom server or other files at the root of /app that need specific ownership:
-# RUN chown nextjs:nodejs /app/your-custom-server.js
+# The Next.js server, when running as 'nextjs' user, will need to create/write to '.next/cache'.
+# The '.next' directory (containing '.next/static') is now owned by 'nextjs'.
+# The 'nextjs' user should have permission to create 'cache' inside its own '.next' directory.
+# If '/home/app/.next' was created by COPY with correct ownership, this should be fine.
+# As an extra measure, ensure the root of the app directory is owned by nextjs.
+# This is somewhat redundant if --chown is used on all COPY, but doesn't hurt.
+RUN chown -R nextjs:nodejs /home/app
 
 # Switch to the non-root user
 USER nextjs
 
 # Start the Next.js server
+# The server.js in standalone mode is designed to find assets relative to its location.
 CMD ["node", "server.js"]
