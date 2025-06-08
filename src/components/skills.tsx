@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
-    GitBranch, Code, Box, TestTube2, Rocket, Server, Users, X, BotMessageSquare
+    GitBranch, TestTube2, Rocket, Server, Users, X, BotMessageSquare
 } from "lucide-react";
 import { FaJenkins, FaDocker, FaGithub, FaGitAlt, FaCloud } from "react-icons/fa";
 import { SiKubernetes, SiSonarqube, SiHelm } from "react-icons/si";
