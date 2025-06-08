@@ -59,7 +59,7 @@ const pipelineData: PipelineStage[] = [
         icon: <Rocket size={32} />,
         tools: [
             { name: "Argo CD", icon: <Rocket />, description: "Implementing GitOps workflows with Argo CD for declarative, automated, and auditable application deployments to Kubernetes." },
-            { name: "Helm", icon: <SiHelm />, description: "Packaging and managing Kubernetes applications with Helm charts for reusable, versioned, and simplified deployments." },
+            { name: "Helm", icon: <SiHelm />, description: "Managing Kubernetes applications with Helm charts for reusable, versioned, and simplified deployments." },
         ]
     },
     {
