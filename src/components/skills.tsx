@@ -1,318 +1,164 @@
 "use client";
 
-import React, { useState, useRef, useMemo, useEffect, useCallback } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { Text, Billboard } from "@react-three/drei";
-import { motion } from "framer-motion-3d";
-import { useMotionValue, useSpring, motion as motion2d, AnimatePresence } from "framer-motion";
-import type { PanInfo } from "framer-motion"; // Ensure PanInfo is imported
-import * as THREE from "three";
-import { Star, Github, RefreshCw, Settings, Box, Ship, Combine, CloudCog, Workflow, Users, CheckCircle, TerminalSquare as DevOpsIcon, XCircle,} from "lucide-react";
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+    GitBranch, Code, Box, TestTube2, Rocket, Server, Users, X, BotMessageSquare
+} from "lucide-react";
+import { FaJenkins, FaDocker, FaGithub, FaGitAlt, FaCloud } from "react-icons/fa";
+import { SiKubernetes, SiSonarqube, SiHelm } from "react-icons/si";
 
-// --- Type Aliases ---
-type FramerMotionEvent = MouseEvent | TouchEvent | PointerEvent;
-
-// --- Data Structure ---
-interface SkillData3D {
-    id: string;
+// --- Data Structure for the Pipeline ---
+interface Tool {
     name: string;
-    icon?: React.ReactNode;
-    rating: number;
-    details: string;
-    category: 'Methodology' | 'Version Control' | 'CI/CD & Automation' | 'Code Quality' | 'Containers & Orchestration' | 'Cloud Platform';
-    position?: [number, number, number];
+    icon: React.ReactNode;
+    description: string;
 }
 
-// --- Skills Data ---
-const skillsData: SkillData3D[] = [
-    { id: "devops_culture", name: "DevOps Culture", icon: <DevOpsIcon size={20}/>, rating: 5, details: "Leveraging the best outcomes by following the best practices of DevOps.", category: "Methodology" },
-    { id: "agile", name: "Agile", icon: <Users size={20}/>, rating: 5, details: "Implementing the Agile Methodology to embrace the best practices.", category: "Methodology" },
-    { id: "sdlc", name: "SDLC Opt.", icon: <Workflow size={20}/>, rating: 5, details: "Implementing SDLC phases at each phase of the project lifecycle.", category: "Methodology" },
-    { id: "cicd_principles", name: "CI/CD Principles", icon: <RefreshCw size={20}/>, rating: 5, details: "Designing and building secured CI/CD pipelines.", category: "CI/CD & Automation" },
-    { id: "git_github", name: "Git & GitHub", icon: <Github size={22}/>, rating: 5, details: "excelled in Distributed Version Control System like Git and GitHub.", category: "Version Control" },
-    { id: "jenkins", name: "Jenkins", icon: <Settings size={22}/>, rating: 4, details: "Managed Jenkins instances, creating secured CI/CD pipelinesd.", category: "CI/CD & Automation" },
-    { id: "azure_devops", name: "Azure DevOps", icon: <CloudCog size={22}/>, rating: 4, details: "Excelling in cloud platforms like Azure.", category: "CI/CD & Automation" },
-    { id: "argocd", name: "Argo CD", icon: <RefreshCw size={22}/>, rating: 4, details: "Implemented GitOps workflows using Argo CD by finding new ways of implementation.", category: "CI/CD & Automation" },
-    { id: "sonarqube", name: "SonarQube", icon: <CheckCircle size={22}/>, rating: 4, details: "Integrated SonarQube for code quality and Code smell.", category: "Code Quality" },
-    { id: "docker", name: "Docker", icon: <Box size={24}/>, rating: 5, details: "Developed optimized Dockerfiles, managed images securely.", category: "Containers & Orchestration" },
-    { id: "kubernetes", name: "Kubernetes", icon: <Ship size={24}/>, rating: 5, details: "Deployed, managed, scaled applications on K8S securely by following the best practices.", category: "Containers & Orchestration" },
-    { id: "helm", name: "Helm", icon: <Ship size={20}/>, rating: 4, details: "Created Helm charts for templating K8s apps and deployed them as multiple source of truth.", category: "Containers & Orchestration" },
-    { id: "openshift", name: "OpenShift", icon: <Combine size={24}/>, rating: 3, details: "Worked with OpenShift for enterprise K8s and integrated ArgoCD for CD.", category: "Containers & Orchestration" },
+interface PipelineStage {
+    name: string;
+    icon: React.ReactNode;
+    tools: Tool[];
+}
+
+// --- Your Skills Organized into Pipeline Stages ---
+const pipelineData: PipelineStage[] = [
+    {
+        name: "Plan & Collaborate",
+        icon: <Users size={32} />,
+        tools: [
+            { name: "Agile", icon: <Users />, description: "Expert in Agile methodologies, facilitating iterative development, sprint planning, and daily stand-ups to ensure adaptive and collaborative project execution." },
+            { name: "DevOps Culture", icon: <BotMessageSquare />, description: "Championing a DevOps culture of shared responsibility, transparency, and continuous improvement to break down silos and accelerate delivery." }
+        ]
+    },
+    {
+        name: "Code & Version",
+        icon: <GitBranch size={32} />,
+        tools: [
+            { name: "Git", icon: <FaGitAlt />, description: "Proficient in Git for distributed version control, including complex branching, merging, and rebasing strategies." },
+            { name: "GitHub", icon: <FaGithub />, description: "Utilizing GitHub for collaborative development, including pull requests, code reviews, and managing repositories with best practices." },
+        ]
+    },
+    {
+        name: "Build & Integrate",
+        icon: <FaJenkins size={32} />,
+        tools: [
+            { name: "Jenkins", icon: <FaJenkins />, description: "Designing and managing robust, automated CI pipelines with Jenkins, from simple builds to complex, multi-stage workflows." },
+            { name: "Docker", icon: <FaDocker />, description: "Creating optimized, multi-stage Dockerfiles and managing container images for consistent and portable application environments." },
+        ]
+    },
+    {
+        name: "Test & Analyze",
+        icon: <TestTube2 size={32} />,
+        tools: [
+            { name: "SonarQube", icon: <SiSonarqube />, description: "Integrating SonarQube into CI pipelines to enforce code quality, identify vulnerabilities, and maintain a high standard of code health." }
+        ]
+    },
+    {
+        name: "Deploy & Release",
+        icon: <Rocket size={32} />,
+        tools: [
+            { name: "Argo CD", icon: <Rocket />, description: "Implementing GitOps workflows with Argo CD for declarative, automated, and auditable application deployments to Kubernetes." },
+            { name: "Helm", icon: <SiHelm />, description: "Packaging and managing Kubernetes applications with Helm charts for reusable, versioned, and simplified deployments." },
+        ]
+    },
+    {
+        name: "Operate & Orchestrate",
+        icon: <Server size={32} />,
+        tools: [
+            { name: "Kubernetes", icon: <SiKubernetes />, description: "Deploying, managing, and scaling containerized applications on Kubernetes, with a deep understanding of pods, services, and ingress." },
+            { name: "OpenShift", icon: <Server />, description: "Working with Red Hat OpenShift for enterprise-grade Kubernetes, providing enhanced security and developer tooling." },
+            { name: "Azure DevOps", icon: <FaCloud />, description: "Leveraging the full suite of Azure DevOps for end-to-end lifecycle management, from work item tracking to release pipelines." },
+        ]
+    },
 ];
 
-// --- Constants ---
-const BASE_SPHERE_RADIUS = 3.8;
-const BASE_ROTATION_SPEED_DPS = 7;
-const DRAG_SENSITIVITY = 0.22;
-const CATEGORY_COLORS: Record<SkillData3D['category'], string> = {
-    'Methodology': '#f07178', 'Version Control': '#c3e88d', 'CI/CD & Automation': '#89ddff',
-    'Code Quality': '#ffcb6b', 'Containers & Orchestration': '#c792ea', 'Cloud Platform': '#ff9cac',
-};
-const DEFAULT_COLOR = '#ffffff';
-const MOBILE_BREAKPOINT = 880;
-
-// --- Helper: Spherical Coords ---
-function getSphericalPosition(index: number, count: number, radius: number): [number, number, number] {
-    const phi = Math.acos(-1 + (2 * index) / (Math.max(1, count - 1) || 1));
-    const theta = Math.sqrt(Math.max(1, count) * Math.PI) * phi;
-    const x = radius * Math.sin(phi) * Math.cos(theta);
-    const y = radius * Math.sin(phi) * Math.sin(theta);
-    const z = radius * Math.cos(phi);
-    return [x, y, z];
-}
-
-// --- Helper Hook: Screen Size ---
-const useIsMobile = (breakpoint = MOBILE_BREAKPOINT) => {
-    const [isMobile, setIsMobile] = useState(false);
-    useEffect(() => {
-        const checkScreenSize = () => setIsMobile(window.innerWidth < breakpoint);
-        if (typeof window !== "undefined") {
-            checkScreenSize();
-            window.addEventListener('resize', checkScreenSize);
-            return () => window.removeEventListener('resize', checkScreenSize);
-        }
-    }, [breakpoint]);
-    return isMobile;
-};
-
-// --- Components ---
-const RatingStarsHTML = ({ rating }: { rating: number }) => (
-    <div className="nebula-rating">
-        {[...Array(5)].map((_, i) => ( <Star key={i} size={14} className={`nebula-rating-star ${i < rating ? 'filled' : ''}`} strokeWidth={2}/> ))}
-    </div>
-);
-
-interface PositionedSkillData3D extends SkillData3D {
-    position: [number, number, number];
-}
-
-const SkillNode3D = ({ skill, onHover, onClick, isHovered, isSelected }: {
-    skill: PositionedSkillData3D;
-    onHover: (id: string | null) => void;
-    onClick: (skill: SkillData3D) => void;
-    isHovered: boolean;
-    isSelected: boolean;
-}) => {
-    const scale = isSelected ? 1.35 : (isHovered ? 1.2 : 1);
-    const color = CATEGORY_COLORS[skill.category] || DEFAULT_COLOR;
-    const nodeRef = useRef<THREE.Group>(null!);
-    useFrame(({ camera }) => { if (nodeRef.current) nodeRef.current.lookAt(camera.position); });
-    return (
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        <motion.group ref={nodeRef} position={skill.position} onPointerOver={(e) => { e.stopPropagation(); onHover(skill.id); }} onPointerOut={() => onHover(null)} onClick={(e) => { e.stopPropagation(); onClick(skill); }} animate={{ scale }} transition={{ type: 'spring', stiffness: 200, damping: 15 }} {...({} as any)}>
-            <Billboard>
-                <Text fontSize={0.23} color={color} anchorX="center" anchorY="middle" outlineWidth={0.012} outlineColor="#0a0a12" maxWidth={1.9}>{skill.name}</Text>
-            </Billboard>
-            <mesh position={[0, 0, -0.01]}><planeGeometry args={[skill.name.length * 0.1 + 0.35, 0.45]} /><meshBasicMaterial transparent opacity={0} depthWrite={false} /></mesh>
-        </motion.group>
-    );
-};
-
-const SceneContent = React.memo(({
-    positionedSkills, isPaused, rotationY, smoothRotationY,
-    onHover, onClick, selectedSkill, hoveredId, sphereRadius, wireframeOpacity
-}: {
-    positionedSkills: PositionedSkillData3D[];
-    isPaused: boolean;
-    rotationY: ReturnType<typeof useMotionValue<number>>;
-    smoothRotationY: ReturnType<typeof useSpring>;
-    onHover: (id: string | null) => void;
-    onClick: (skill: SkillData3D) => void;
-    selectedSkill: SkillData3D | null;
-    hoveredId: string | null;
-    sphereRadius: number;
-    wireframeOpacity: number;
-}) => {
-    const groupRef = useRef<THREE.Group>(null!);
-    useFrame((_state, delta) => {
-        if (!isPaused && groupRef.current) {
-            const currentY = rotationY.get();
-            const speedRadPerSec = THREE.MathUtils.degToRad(BASE_ROTATION_SPEED_DPS);
-            const dt = Math.min(delta, 0.1);
-            rotationY.set(currentY + speedRadPerSec * dt);
-        }
-    });
-    return (
-        <>
-            <ambientLight intensity={0.75} />
-            <pointLight position={[10, 15, 10]} intensity={1.1} castShadow />
-            <pointLight position={[-10, -5, -15]} intensity={0.4} color="#b0c4ff" />
-            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-            <motion.group ref={groupRef} rotation-y={smoothRotationY} {...({} as any)}>
-                <mesh scale={sphereRadius} renderOrder={-1}>
-                    <sphereGeometry args={[1, 24, 24]} />
-                    <meshStandardMaterial 
-                        wireframe 
-                        color="#607D8B"
-                        opacity={wireframeOpacity} 
-                        transparent 
-                        depthWrite={false} 
-                        roughness={0.8} 
-                        metalness={0.1}
-                    />
-                </mesh>
-                {positionedSkills.map((skill) => (
-                    <SkillNode3D key={skill.id} skill={skill} onHover={onHover} onClick={onClick} isHovered={hoveredId === skill.id} isSelected={selectedSkill?.id === skill.id} />
-                ))}
-            </motion.group>
-        </>
-    );
-});
-SceneContent.displayName = "SceneContent";
-
 // --- Main Component ---
-const Skills = () => {
-    const titleRef = useRef<HTMLHeadingElement>(null);
-    const [hoveredId, setHoveredId] = useState<string | null>(null);
-    const [selectedSkill, setSelectedSkill] = useState<SkillData3D | null>(null);
-    const [isDragging, setIsDragging] = useState(false);
-    const [detailViewActive, setDetailViewActive] = useState(false);
-
-    const isMobile = useIsMobile();
-
-    const [sphereRadius, setSphereRadius] = useState(BASE_SPHERE_RADIUS);
-    const [cameraZ, setCameraZ] = useState(BASE_SPHERE_RADIUS * 2.5);
-    const [wireframeOpacity, setWireframeOpacity] = useState(0.35);
-
-    const rotationY = useMotionValue(0);
-    const smoothRotationY = useSpring(rotationY, { stiffness: 100, damping: 30, mass: 0.5, restDelta: 0.001 });
-
-    const isPaused = hoveredId !== null || selectedSkill !== null || isDragging || detailViewActive;
-
-    const positionedSkills: PositionedSkillData3D[] = useMemo(() => {
-        const count = skillsData.length;
-        return skillsData.map((skill, i) => ({
-            ...skill,
-            position: getSphericalPosition(i, count, sphereRadius),
-        }));
-    }, [sphereRadius]);
-
-    useEffect(() => {
-        const handleResize = () => {
-            const width = window.innerWidth;
-            if (width < MOBILE_BREAKPOINT) {
-                setSphereRadius(BASE_SPHERE_RADIUS * 0.75);
-                setCameraZ(BASE_SPHERE_RADIUS * 3.0);
-                setWireframeOpacity(0.2);
-            } else {
-                setSphereRadius(BASE_SPHERE_RADIUS);
-                setCameraZ(BASE_SPHERE_RADIUS * 2.5);
-                setWireframeOpacity(0.35);
-            }
-        };
-        if (typeof window !== "undefined") {
-            handleResize();
-            window.addEventListener('resize', handleResize);
-            return () => window.removeEventListener('resize', handleResize);
-        }
-    }, []);
-
-    const handleHover = useCallback((id: string | null) => { if (!detailViewActive) setHoveredId(id); }, [detailViewActive]);
-    const handleClick = useCallback((skill: SkillData3D) => {
-        if (selectedSkill?.id === skill.id) {
-            setDetailViewActive(false); setSelectedSkill(null);
-        } else {
-            setSelectedSkill(skill); setDetailViewActive(true);
-        }
-    }, [selectedSkill]);
-    const handleCloseDetails = useCallback(() => { setDetailViewActive(false); setSelectedSkill(null); }, []);
-
-    const dragStartRotation = useRef(0);
-    
-    const handleDragStart = (
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        _event?: FramerMotionEvent,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        _info?: PanInfo
-    ) => { 
-        setIsDragging(true); 
-        dragStartRotation.current = rotationY.get(); 
-        smoothRotationY.stop(); 
-    };
-    
-    const handleDrag = (
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        _event: FramerMotionEvent,
-        info: PanInfo
-    ) => {
-        rotationY.set(dragStartRotation.current + info.offset.x * DRAG_SENSITIVITY);
-    };
-
-    const handleDragEnd = (
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        _event?: FramerMotionEvent,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        _info?: PanInfo
-    ) => { 
-        setIsDragging(false); 
-    };
-
-    const [titleInView, setTitleInView] = useState(false);
-    useEffect(() => {
-        const observer = new IntersectionObserver(([entry]) => setTitleInView(entry.isIntersecting), { threshold: 0.1 });
-        const currentTitleRef = titleRef.current;
-        if (currentTitleRef) observer.observe(currentTitleRef);
-        return () => { if (currentTitleRef) observer.unobserve(currentTitleRef); };
-    }, []);
-
-    const canvasContainerVariants = {
-        center: { x: "0%", width: "100%", transition: { type: "spring", stiffness: 100, damping: 20 } },
-        desktopAside: { x: "-20%", width: "60%", transition: { type: "spring", stiffness: 100, damping: 20 } },
-        mobileAside: { y: "-20%", height: "45%", scale: 0.85, transition: { type: "spring", stiffness: 100, damping: 20 } }
-    };
-    const detailsPanelVariants = {
-        hidden: (isMobileParam: boolean) => ({ opacity: 0, ...(isMobileParam ? { y: "100%" } : { x: "100%" }) }),
-        visible: () => ({ opacity: 1, y: "0%", x: "0%", transition: { type: "spring", stiffness: 100, damping: 20, delay: 0.1 } }),
-        exit: (isMobileParam: boolean) => ({ opacity: 0, ...(isMobileParam ? { y: "100%" } : { x: "100%" }), transition: { duration: 0.25, ease: "easeIn" } })
-    };
-
-    const currentCanvasVariant = detailViewActive ? (isMobile ? "mobileAside" : "desktopAside") : "center";
+export default function Skills() {
+    const [selectedTool, setSelectedTool] = useState<Tool | null>(null);
 
     return (
-        <section className={`skill-nebula-section temporal-flux-theme ${detailViewActive ? 'detail-view-active' : ''} ${isMobile ? 'is-mobile' : 'is-desktop'}`}>
-            <motion2d.h2 ref={titleRef} initial={{ opacity: 0, y: 30 }} animate={titleInView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.6 }} className="skill-nebula-title">
-                Expertised Tools
-            </motion2d.h2>
-            
-            <div className="skill-nebula-main-content">
-                <motion2d.div
-                    className="skill-canvas-container"
-                    drag="x" dragConstraints={{ left: 0, right: 0 }} dragElastic={0}
-                    onDragStart={handleDragStart} onDrag={handleDrag} onDragEnd={handleDragEnd}
-                    style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
-                    variants={canvasContainerVariants}
-                    animate={currentCanvasVariant}
-                >
-                    <Canvas camera={{ position: [0, 0, cameraZ], fov: 50 }} shadows dpr={[1, 1.5]}>
-                        <SceneContent
-                            positionedSkills={positionedSkills} isPaused={isPaused}
-                            rotationY={rotationY} smoothRotationY={smoothRotationY}
-                            onHover={handleHover} onClick={handleClick}
-                            selectedSkill={selectedSkill} hoveredId={hoveredId}
-                            sphereRadius={sphereRadius} wireframeOpacity={wireframeOpacity}
-                        />
-                    </Canvas>
-                </motion2d.div>
+        <section className="skills-pipeline-section">
+            <div className="skills-pipeline-container">
+                <h2 className="skills-pipeline-title">My DevOps Workflow & Expertise</h2>
+                <p className="skills-pipeline-subtitle">
+                    A visual representation of the tools and methodologies I use across the software delivery lifecycle.
+                    Hover over a stage to see the tools, and click a tool for details.
+                </p>
 
-                <AnimatePresence>
-                    {detailViewActive && selectedSkill && (
-                        <motion2d.div
-                            className="nebula-details-panel-standalone"
-                            custom={isMobile}
-                            variants={detailsPanelVariants}
-                            initial="hidden" animate="visible" exit="exit"
-                        >
-                            <button className="nebula-close-btn" onClick={handleCloseDetails} title="Close"><XCircle size={20} /></button>
-                            <h3 style={{ color: CATEGORY_COLORS[selectedSkill.category] || DEFAULT_COLOR }}>{selectedSkill.name}</h3>
-                            <RatingStarsHTML rating={selectedSkill.rating} />
-                            <p className="details-text-scrollable">{selectedSkill.details}</p>
-                        </motion2d.div>
-                    )}
-                </AnimatePresence>
+                <div className="pipeline-wrapper">
+                    <div className="pipeline-background-line" />
+                    {pipelineData.map((stage, index) => (
+                        <React.Fragment key={stage.name}>
+                            <div className="pipeline-stage-group">
+                                <motion.div 
+                                    className="pipeline-stage-node"
+                                    whileHover={{ scale: 1.1 }}
+                                >
+                                    <div className="node-icon">{stage.icon}</div>
+                                    <div className="node-label">{stage.name}</div>
+                                </motion.div>
+                                <div className="tools-container">
+                                    {stage.tools.map((tool) => (
+                                        <motion.div
+                                            key={tool.name}
+                                            className="tool-card"
+                                            onClick={() => setSelectedTool(tool)}
+                                            whileHover={{ y: -5, boxShadow: "0px 10px 20px rgba(0, 0, 0, 0.2)" }}
+                                            transition={{ type: "spring", stiffness: 300 }}
+                                        >
+                                            <div className="tool-icon">{tool.icon}</div>
+                                            <span className="tool-name">{tool.name}</span>
+                                        </motion.div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {index < pipelineData.length - 1 && (
+                                <div className="pipeline-connector">
+                                    <div className="pipeline-flow" />
+                                </div>
+                            )}
+                        </React.Fragment>
+                    ))}
+                </div>
             </div>
-            <p className="skill-nebula-hint">Drag horizontally to rotate. Hover or click skills.</p>
+
+            <AnimatePresence>
+                {selectedTool && (
+                    <motion.div
+                        className="skill-details-overlay"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={() => setSelectedTool(null)}
+                    >
+                        <motion.div
+                            className="skill-details-modal"
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            transition={{ type: "spring", stiffness: 250, damping: 25 }}
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <button
+                                className="modal-close-btn"
+                                onClick={() => setSelectedTool(null)}
+                                aria-label="Close modal"
+                                title="Close"
+                            >
+                                <X size={24} />
+                            </button>
+                            <div className="modal-header">
+                                <div className="modal-icon">{selectedTool.icon}</div>
+                                <h3 className="modal-title">{selectedTool.name}</h3>
+                            </div>
+                            <p className="modal-description">{selectedTool.description}</p>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </section>
     );
-};
+}
 
-export default Skills;

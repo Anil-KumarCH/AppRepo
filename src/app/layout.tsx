@@ -1,63 +1,50 @@
 // src/app/layout.tsx
-"use client"; // Required because we're using useState and useEffect
+import type { Metadata } from "next";
+// Using a standard font like Inter is a good practice.
+// Ensure you have `next/font` installed.
+import { Inter } from "next/font/google"; 
 
-import React, { useState, useEffect } from "react";
-// import { Geist, Geist_Mono } from "next/font/google"; // Assuming Geist is not used or defined elsewhere
-import "../../styles/globals.css"; // Ensure this path is correct
+import "../../styles/globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/footer";
-import LoadingScreen from "../components/loading";
-import { AnimatePresence } from "framer-motion";
+import { PageWrapper } from "./page-wrapper"; // Import the new client wrapper component
 
-// If you are using Geist fonts, ensure they are correctly configured and imported.
-// For example:
-// const geistSans = Geist({
-//   variable: "--font-geist-sans",
-//   subsets: ["latin"],
-// });
+// Initialize the font
+const inter = Inter({ 
+  subsets: ["latin"],
+  variable: '--font-inter', // Optional: if you want to use it as a CSS variable
+});
 
-// const geistMono = Geist_Mono({
-//   variable: "--font-geist-mono",
-//   subsets: ["latin"],
-// });
-
+// Use the recommended Metadata API for Server Components
+export const metadata: Metadata = {
+  title: "Anil Kumar - Portfolio",
+  description: "DevOps Engineer of Anil Kumar",
+  // The viewport meta tag is now included by default in Next.js 13+
+  // but this is how you would customize it if needed.
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+  },
+  icons: {
+    icon: "/assets/loading_logo.png", // Path to your favicon in the public folder
+  },
+};
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000); // Adjust duration as needed
-
-    return () => clearTimeout(timer); // Cleanup timer
-  }, []); // Empty dependency array so it runs only once on mount
-
   return (
     <html lang="en">
-      <head>
-        <title>Anil Kumar - Portfolio</title>
-        <meta name="description" content="DevOps Engineer and Full Stack Developer Portfolio of Anil Kumar" />
-        {/* *** ADDED VIEWPORT META TAG FOR RESPONSIVENESS *** */}
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="icon" href="/assets/loading_logo.png" /> {/* Ensure path is correct (public folder) */}
-      </head>
-      {/* Apply font variables to body if Geist (or other fonts) are used */}
-      {/* <body className={`${geistSans.variable} ${geistMono.variable} main-body-container`}> */}
-      <body className="main-body-container"> {/* Removed font variables if not defined/used */}
-        <AnimatePresence mode="wait">
-          {isLoading && <LoadingScreen key="loadingScreen" />}
-        </AnimatePresence>
-
-        <div className={`app-content ${isLoading ? 'hidden-during-load' : 'visible-after-load'}`}>
+      {/* The font class is applied to the body for consistent typography */}
+      <body className={`${inter.variable} main-body-container`}>
+        {/* PageWrapper handles the client-side loading screen and animations */}
+        <PageWrapper>
           <Navbar />
           {children}
           <Footer />
-        </div>
+        </PageWrapper>
       </body>
     </html>
   );
