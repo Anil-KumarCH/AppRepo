@@ -74,7 +74,7 @@ body {
   position: relative;
   background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif; /* This is a very basic fallback. If using Geist or Inter, ensure it's primary */
+  font-family: var(--tf-font-primary); /* This is a very basic fallback. If using Geist or Inter, ensure it's primary */
   margin: 0;
   padding: 0;
   overflow-x: hidden !important;
@@ -127,6 +127,15 @@ html {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+@media (min-width: 880px) {
+  .navbar-content {
+    /* Now, on larger screens, you can constrain the width */
+    max-width: 1280px; 
+    /* Remove the padding from the container, and use it inside the content instead
+       if you want a different look. However, the existing padding on the parent
+       `navbar-container` will handle it for all screen sizes. */
+  }
 }
 
 .navbar-logo {
