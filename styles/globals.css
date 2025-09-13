@@ -331,13 +331,14 @@ html {
 
 @media (max-width: 768px) {
   .hero-text {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
+    padding: auto;
   }
 
   .hero-container {
     background-position: 40% 50%;
-    align-items: flex-end;
-    justify-content: flex-end;
+    align-items: flex;
+    justify-content: flex;
     text-align: right;
     padding: 8rem 1.5rem 4rem 1.5rem;
   }
