@@ -332,7 +332,7 @@ html {
 @media (max-width: 768px) {
   .hero-text {
     font-size: 1.2rem;
-    padding: auto;
+    padding-bottom: 8px;
   }
 
   .hero-container {
