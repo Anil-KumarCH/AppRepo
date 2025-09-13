@@ -335,7 +335,7 @@ html {
   }
 
   .hero-container {
-    background-position: 20% 40%;
+    background-position: 10% 20%;
   }
 }
 
@@ -933,10 +933,10 @@ html {
     .project-card-small { min-width: 90px; height: 55px; }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 768px) { /* Change here for project section mobile view */
     .projects-section { padding: 2rem 0.5rem; }
     .project-title { font-size: 1.2rem; margin-bottom: 1rem; }
-    .big-box { aspect-ratio: 9 / 13; min-height: 320px; border-radius: 0.5rem; }
+    .big-box { aspect-ratio: 9 / 16; min-height: 320px; border-radius: 0.5rem; }
     .big-box-content-overlay { top: 60%; height: 35%; max-width: 98%; left: 1%; right: 1%; padding: 0 0.5rem; }
     .big-box-title { font-size: 1rem; }
     .big-box-description, .full-description { font-size: 0.7rem; }
