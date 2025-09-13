@@ -933,25 +933,7 @@ html {
     .project-card-small { min-width: 90px; height: 55px; }
 }
 
-@media (max-width: 767px) {
-  .projects-section { padding: 3rem 1rem; }
-  .project-title { transform: scaleY(1.2); font-size: clamp(1.8rem, 6vw, 2.5rem); margin-bottom: 1.5rem; }
-  .big-box { aspect-ratio: 3 / 4; max-height: 80vh; border-radius: 0.8rem; }
-  .left-gradient { width: 100%; background: linear-gradient(to right, rgba(0, 0, 0, 0.7), rgba(0,0,0,0.3) 70%, transparent); }
-  .bottom-gradient { height: 60%; background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent); }
-  .big-box-content-overlay { max-width: 90%; left: 5%; right: 5%; bottom: auto; top: 55%; padding-right: 0; height: 40%; }
-  .content-wrapper { max-height: 100%; }
-  .big-box-title { font-size: clamp(1.1rem, 4vw, 1.4rem); margin-bottom: 0.5rem; }
-  .big-box-description, .full-description { font-size: clamp(0.75rem, 3vw, 0.85rem); line-height: 1.5; }
-  .read-more-button { padding: 0.4rem 0.8rem; font-size: 0.75rem; }
-  .carousel-overlay { position: relative; width: 100%; max-width: none; bottom: auto; right: auto; left: auto; margin-top: 1.5rem; padding: 0; justify-content: center; }
-  .carousel { max-width: calc(100% - 80px); order: 1; }
-  .arrow-button.left { order: 0; }
-  .arrow-button.right { order: 2; }
-  .project-card-small { min-width: 80px; height: 50px; }
-
-  /* Mobile-specific adjustments */
-  @media (max-width: 480px) {
+@media (max-width: 768px) {
     .projects-section { padding: 2rem 0.5rem; }
     .project-title { font-size: 1.2rem; margin-bottom: 1rem; }
     .big-box { aspect-ratio: 9 / 13; min-height: 320px; border-radius: 0.5rem; }
@@ -964,7 +946,6 @@ html {
     .project-card-small { min-width: 60px; height: 38px; }
     .arrow-button { padding: 0.3rem; }
     .arrow-button svg { width: 14px; height: 14px; }
-  }
 }
 
 
