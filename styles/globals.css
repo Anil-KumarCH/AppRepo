@@ -77,6 +77,7 @@ body {
   font-family: var(--tf-font-primary); /* This is a very basic fallback. If using Geist or Inter, ensure it's primary */
   margin: 0;
   padding: 0;
+  overflow-x: hidden !important;
 }
 
 html {
@@ -334,11 +335,7 @@ html {
   }
 
   .hero-container {
-    background-position: 25% 50%;
-    padding: 12rem 1.5rem 4rem 1.5rem;
-    align-items: center;
-    justify-content: flex-end; /* Keep it at the bottom */
-    text-align: center;
+    background-position: 20% 40%;
   }
 }
 
@@ -949,19 +946,28 @@ html {
   .read-more-button { padding: 0.4rem 0.8rem; font-size: 0.75rem; }
   .carousel-overlay { position: relative; width: 100%; max-width: none; bottom: auto; right: auto; left: auto; margin-top: 1.5rem; padding: 0; justify-content: center; }
   .carousel { max-width: calc(100% - 80px); order: 1; }
-  .arrow-button.left { order: 0; } /* Assuming you add .left and .right classes to arrow buttons */
+  .arrow-button.left { order: 0; }
   .arrow-button.right { order: 2; }
   .project-card-small { min-width: 80px; height: 50px; }
+
+  /* Mobile-specific adjustments */
+  @media (max-width: 480px) {
+    .projects-section { padding: 2rem 0.5rem; }
+    .project-title { font-size: 1.2rem; margin-bottom: 1rem; }
+    .big-box { aspect-ratio: 9 / 13; min-height: 320px; border-radius: 0.5rem; }
+    .big-box-content-overlay { top: 60%; height: 35%; max-width: 98%; left: 1%; right: 1%; padding: 0 0.5rem; }
+    .big-box-title { font-size: 1rem; }
+    .big-box-description, .full-description { font-size: 0.7rem; }
+    .read-more-button { font-size: 0.7rem; padding: 0.3rem 0.6rem; }
+    .carousel-overlay { margin-top: 1rem; }
+    .carousel { max-width: 100%; }
+    .project-card-small { min-width: 60px; height: 38px; }
+    .arrow-button { padding: 0.3rem; }
+    .arrow-button svg { width: 14px; height: 14px; }
+  }
 }
 
-@media (max-width: 480px) {
-    .big-box { aspect-ratio: 9 / 13; }
-    .big-box-content-overlay { top: 50%; height: 45%; }
-    .carousel { max-width: calc(100% - 70px); }
-    .project-card-small { min-width: 70px; height: 45px; }
-    .arrow-button { padding: 0.5rem; }
-    .arrow-button svg { width: 16px; height: 16px; }
-}
+
 
 /* ================================= */
 /* SKILLS - CI/CD PIPELINE SECTION   */
