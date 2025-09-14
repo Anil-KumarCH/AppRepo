@@ -32,16 +32,16 @@ export default function Hero() {
           </motion.h1>
         )}
         {step === 1 && (
-          <motion.h1
+            <motion.h1
             key="name"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 2 }}
             className="hero-text"
-          >
-            I'm Anil Kumar Choppadandi, CloudEngineer @TCS
-          </motion.h1>
+            >
+            I&apos;m Anil Kumar Choppadandi, CloudEngineer @TCS
+            </motion.h1>
         )}
         {step === 2 && (
           <motion.h1
