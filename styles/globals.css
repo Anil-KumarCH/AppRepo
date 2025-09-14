@@ -1174,6 +1174,7 @@ html {
   align-items: center;
   gap: 1.5rem;
   z-index: 5;
+  cursor: pointer; /* Add pointer to indicate it's clickable */
 }
 
 .pipeline-stage-node {
@@ -1181,7 +1182,6 @@ html {
   flex-direction: column;
   align-items: center;
   gap: 0.75rem;
-  cursor: default;
 }
 
 /* --- NEW: Pulsing Node Animation --- */
@@ -1203,7 +1203,8 @@ html {
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   animation: pulse-node 4s ease-in-out infinite; /* --- NEW: Apply pulsing animation --- */
 }
-.pipeline-stage-group:hover .node-icon {
+.pipeline-stage-group:hover .node-icon,
+.pipeline-stage-group.is-active .node-icon {
   border-color: #c084fc; /* --- CHANGE: Use purple accent on hover --- */
   background: linear-gradient(145deg, #2d1a3f, #1a0f25);
   box-shadow: 0 0 35px rgba(192, 132, 250, 0.6), inset 0 0 15px rgba(192, 132, 250, 0.2);
@@ -1226,14 +1227,20 @@ html {
   transform: translateY(15px);
   transition: opacity 0.4s ease, transform 0.4s ease;
   transition-delay: 0.1s;
+  pointer-events: none; /* Prevent interaction when hidden */
 }
-.pipeline-stage-group:hover .tools-container {
+
+/* THIS IS THE KEY CHANGE FOR THE INTERACTION */
+.pipeline-stage-group:hover .tools-container,
+.pipeline-stage-group.is-active .tools-container {
   opacity: 1;
   transform: translateY(0);
+  pointer-events: auto; /* Allow interaction when visible */
 }
 
 /* --- NEW: Staggered animation for tool cards --- */
-.pipeline-stage-group:hover .tool-card {
+.pipeline-stage-group:hover .tool-card,
+.pipeline-stage-group.is-active .tool-card {
     opacity: 1;
     transform: translateY(0);
     transition-property: opacity, transform, background-color, border-color;
@@ -1245,10 +1252,14 @@ html {
     transform: translateY(10px);
     transition-delay: 0s !important; /* Reset delay when hiding */
 }
-.pipeline-stage-group:hover .tool-card:nth-child(1) { transition-delay: 0.15s; }
-.pipeline-stage-group:hover .tool-card:nth-child(2) { transition-delay: 0.2s; }
-.pipeline-stage-group:hover .tool-card:nth-child(3) { transition-delay: 0.25s; }
-.pipeline-stage-group:hover .tool-card:nth-child(4) { transition-delay: 0.3s; }
+.pipeline-stage-group:hover .tool-card:nth-child(1),
+.pipeline-stage-group.is-active .tool-card:nth-child(1) { transition-delay: 0.15s; }
+.pipeline-stage-group:hover .tool-card:nth-child(2),
+.pipeline-stage-group.is-active .tool-card:nth-child(2) { transition-delay: 0.2s; }
+.pipeline-stage-group:hover .tool-card:nth-child(3),
+.pipeline-stage-group.is-active .tool-card:nth-child(3) { transition-delay: 0.25s; }
+.pipeline-stage-group:hover .tool-card:nth-child(4),
+.pipeline-stage-group.is-active .tool-card:nth-child(4) { transition-delay: 0.3s; }
 /* Add more if a stage has more than 4 tools */
 
 
@@ -1375,9 +1386,8 @@ html {
     }
     .node-icon { width: 75px; height: 75px; }
     .node-label { font-size: 0.8rem; }
-    .tools-container { display: none; }
+    /* The problematic display:none rule has been removed */
 }
-
 
 /* ================================= */
 /* LINKEDIN INSIGHTS WALL            */

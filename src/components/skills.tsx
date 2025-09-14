@@ -76,6 +76,11 @@ const pipelineData: PipelineStage[] = [
 // --- Main Component ---
 export default function Skills() {
     const [selectedTool, setSelectedTool] = useState<Tool | null>(null);
+    const [activeStage, setActiveStage] = useState<string | null>(null);
+
+    const handleStageClick = (stageName: string) => {
+        setActiveStage(prevStage => prevStage === stageName ? null : stageName);
+    };
 
     return (
         <section className="skills-pipeline-section">
@@ -90,10 +95,12 @@ export default function Skills() {
                     <div className="pipeline-background-line" />
                     {pipelineData.map((stage, index) => (
                         <React.Fragment key={stage.name}>
-                            <div className="pipeline-stage-group">
-                                <motion.div 
+                            <div
+                                className={`pipeline-stage-group ${activeStage === stage.name ? 'is-active' : ''}`}
+                                onClick={() => handleStageClick(stage.name)}
+                            >
+                                <motion.div
                                     className="pipeline-stage-node"
-                                    whileHover={{ scale: 1.1 }}
                                 >
                                     <div className="node-icon">{stage.icon}</div>
                                     <div className="node-label">{stage.name}</div>
@@ -103,7 +110,10 @@ export default function Skills() {
                                         <motion.div
                                             key={tool.name}
                                             className="tool-card"
-                                            onClick={() => setSelectedTool(tool)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setSelectedTool(tool);
+                                            }}
                                             whileHover={{ y: -5, boxShadow: "0px 10px 20px rgba(0, 0, 0, 0.2)" }}
                                             transition={{ type: "spring", stiffness: 300 }}
                                         >
@@ -161,4 +171,3 @@ export default function Skills() {
         </section>
     );
 }
-
