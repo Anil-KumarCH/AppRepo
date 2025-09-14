@@ -64,7 +64,7 @@ export default function Hero() {
             transition={{ duration: 2 }}
             className="hero-text"
           >
-            Anil Kumar Choppadandi, Cloud Engineer @ TCS
+            Anil Kumar Choppadandi, CloudEngineer @ TCS
           </motion.h1>
         )}
       </AnimatePresence>
