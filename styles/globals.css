@@ -952,7 +952,7 @@ html {
 
   .big-box { 
     width: 100%; /* ADDED: This makes the box fill the screen width */
-    aspect-ratio: 9 / 14; /* CHANGED: Made it a bit taller */
+    aspect-ratio: 11 / 10; /* CHANGED: Made it a bit taller */
     min-height: 55vh; /* CHANGED: Uses viewport height for better scaling */
     border-radius: 0.8rem; /* CHANGED: Slightly larger radius */
   }
