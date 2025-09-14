@@ -952,7 +952,7 @@ html {
 
   .big-box { 
     width: 100%; /* ADDED: This makes the box fill the screen width */
-    aspect-ratio: 10 / 12; /* CHANGED: Made it a bit taller */
+    aspect-ratio: 9.5 / 12; /* CHANGED: Made it a bit taller */
     min-height: 55vh; /* CHANGED: Uses viewport height for better scaling */
     border-radius: 0.8rem; /* CHANGED: Slightly larger radius */
   }
@@ -967,15 +967,15 @@ html {
   }
 
   .big-box-title { 
-    font-size: 1.3rem; /* CHANGED: Made title text larger */
+    font-size: 1rem; /* CHANGED: Made title text larger */
   }
 
   .big-box-description, .full-description { 
-    font-size: 0.9rem; /* CHANGED: Made description text larger */
+    font-size: 0.5rem; /* CHANGED: Made description text larger */
   }
 
   .read-more-button { 
-    font-size: 0.8rem; /* CHANGED */
+    font-size: 0.5rem; /* CHANGED */
     padding: 0.4rem 0.8rem; /* CHANGED */
   }
 
@@ -988,8 +988,8 @@ html {
   }
 
   .project-card-small { 
-    min-width: 70px; /* CHANGED */
-    height: 45px; /* CHANGED */
+    min-width: 60px; /* CHANGED */
+    height: 40px; /* CHANGED */
   }
 
   .arrow-button { 
@@ -997,8 +997,8 @@ html {
   }
 
   .arrow-button svg { 
-    width: 16px; /* CHANGED */
-    height: 16px; /* CHANGED */
+    width: 14px; /* CHANGED */
+    height: 14px; /* CHANGED */
   }
 }
 
